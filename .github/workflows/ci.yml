@@ -1,0 +1,46 @@
+name: Go
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  build:
+    name: Lint Test and Build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25'
+          check-latest: true
+      - name: Set up gotestfmt
+        uses: GoTestTools/gotestfmt-action@v2
+        with:
+          repo: gotestfmt
+      - name: Unit Tests
+        run: |
+          sudo apt install libnss3-tools
+          make setup
+          make test
+      - name: Linting
+        uses: golangci/golangci-lint-action@v8
+      - name: Run Gosec
+        uses: securego/gosec@master
+        with:
+          args: ./...
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: CodeLieutenant/utils

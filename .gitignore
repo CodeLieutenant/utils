@@ -1,0 +1,7 @@
+certs/
+bin/
+coverage.txt
+coverage.out
+.DS_Store
+*.html
+*.log

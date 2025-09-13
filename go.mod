@@ -1,6 +1,6 @@
 module github.com/CodeLieutenant/utils
 
-go 1.24.6
+go 1.25
 
 require (
 	github.com/Oudwins/zog v0.21.6

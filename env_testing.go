@@ -29,15 +29,19 @@ func (p *mapEnvProvider) Set(key, value string) {
 	p.env[p.prefix+key] = value
 }
 
-func NewTestEnv(tb testing.TB) Env {
+func NewTestEnv(tb testing.TB, prefix ...string) Env {
 	tb.Helper()
+	p := ""
 
-	provider := &mapEnvProvider{
-		env: make(map[string]string),
+	if len(prefix) > 0 {
+		p = prefix[0]
 	}
 
-	provider.mu.Lock()
-	defer provider.mu.Unlock()
+	provider := &mapEnvProvider{
+		prefix: p,
+		env:    make(map[string]string),
+	}
+
 	root := ProjectRootDir(tb)
 
 	files := []string{".env", ".env.local", ".env.test", ".env.testing"}
@@ -53,7 +57,10 @@ func NewTestEnv(tb testing.TB) Env {
 			tb.Fatal(err)
 		}
 
+		// Lock only for the map operation
+		provider.mu.Lock()
 		maps.Copy(provider.env, vals)
+		provider.mu.Unlock()
 	}
 
 	// Removed slog.Info and slog.Warn to avoid race conditions in parallel tests

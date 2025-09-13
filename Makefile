@@ -12,7 +12,7 @@ HOSTS ?= localhost 127.0.0.1 ::1
 
 .PHONY: setup
 setup: install-mkcert mkcert-generate mkcert-generate mkcert-install-ca
-
+	cp .env.example .env || true
 
 .PHONY: check
 check: ## Run linters

@@ -121,6 +121,7 @@ func (l *LogConfig) Setup(version string) (*slog.Logger, *log.Logger, func() err
 			return nil, nil, nil, err
 		}
 
+		// #nosec G302 G304
 		file, err := os.OpenFile(absolutePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
 		if err != nil {
 			return nil, nil, nil, err

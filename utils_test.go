@@ -230,8 +230,7 @@ func TestUnsafeConversions(t *testing.T) {
 }
 
 func TestWorkingDir(t *testing.T) {
-	// Safe to run in parallel
-	t.Parallel()
+	// Cannot run in parallel - depends on stable working directory
 	req := require.New(t)
 
 	wd := utils.WorkingDir(t)
@@ -240,8 +239,7 @@ func TestWorkingDir(t *testing.T) {
 }
 
 func TestProjectRootDirAndCache(t *testing.T) {
-	// Safe to run in parallel
-	t.Parallel()
+	// Cannot run in parallel - depends on stable working directory
 	req := require.New(t)
 
 	root1 := utils.ProjectRootDir(t)
@@ -252,8 +250,7 @@ func TestProjectRootDirAndCache(t *testing.T) {
 }
 
 func TestFindFileGoMod(t *testing.T) {
-	// Safe to run in parallel
-	t.Parallel()
+	// Cannot run in parallel - depends on stable working directory
 	req := require.New(t)
 
 	// First, ensure we can find the project root

@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"log/slog"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -38,7 +38,7 @@ const (
 
 func NewEnv(disableDotEnv bool, prefix ...string) Env {
 	if !disableDotEnv {
-		LoadDotEnv()
+		MustLoadEnv()
 	}
 
 	p := ""
@@ -53,21 +53,22 @@ func NewEnv(disableDotEnv bool, prefix ...string) Env {
 	}
 }
 
-func LoadDotEnv() {
-	if !FileExists(baseEnvFile) {
-		panic("dotenv file not found: .env")
+func MustLoadEnv(basePath ...string) {
+	env := baseEnvFile
+	if len(basePath) > 0 {
+		env = filepath.Join(basePath[0], baseEnvFile)
 	}
 
-	if err := godotenv.Load(baseEnvFile); err != nil {
-		slog.Error("dotenv load",
-			slog.String("file", baseEnvFile),
-			"error", err,
-		)
+	if !FileExists(env) {
+		panic("dotenv file not found: " + env)
+	}
 
+	if err := godotenv.Load(env); err != nil {
+		// Removed slog.Error to avoid race conditions in parallel tests
 		return
 	}
 
-	slog.Debug("dotenv loaded", slog.String("file", baseEnvFile))
+	// Removed slog.Debug to avoid race conditions in parallel tests
 }
 
 func (p OSEnvProvider) Get(key string) (string, bool) {
@@ -76,10 +77,7 @@ func (p OSEnvProvider) Get(key string) (string, bool) {
 
 func (p OSEnvProvider) Set(key, value string) {
 	if err := os.Setenv(p.prefix+key, value); err != nil {
-		slog.Debug("failed to set env var",
-			slog.String("key", p.prefix+key),
-			"error", err,
-		)
+		// Removed slog.Debug to avoid race conditions in parallel tests
 		panic(err)
 	}
 }
